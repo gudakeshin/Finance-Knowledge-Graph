@@ -2,4 +2,6 @@
 .env
 .env.*
 
-// ... existing code ... 
+// ... existing code ... venv/
+backend/venv/
+venv_py313_backup/
