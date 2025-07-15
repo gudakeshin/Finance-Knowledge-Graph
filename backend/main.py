@@ -1,9 +1,13 @@
+import logging
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers.process import router as process_router
-from backend.routers.upload import router as upload_router
+from routers.process import router as process_router
+from routers.upload import router as upload_router
+from routers.extraction import router as extraction_router
 from dotenv import load_dotenv
-from backend.app.config import settings
+from app.config import settings
 
 # Load environment variables from .env file
 load_dotenv()
@@ -33,6 +37,7 @@ app.add_middleware(
 # Include routers
 app.include_router(process_router, prefix="/api/v1", tags=["process"])
 app.include_router(upload_router, prefix="/api/v1", tags=["upload"])
+app.include_router(extraction_router, tags=["extraction"])
 
 # Custom endpoints (keep these)
 
@@ -43,3 +48,17 @@ async def root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+# Set up logging to file and console
+log_dir = os.path.join(os.path.dirname(__file__), '../logs')
+os.makedirs(log_dir, exist_ok=True)
+log_file = os.path.join(log_dir, 'backend.log')
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(name)s:%(message)s',
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()
+    ]
+)

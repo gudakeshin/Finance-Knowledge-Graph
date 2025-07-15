@@ -10,6 +10,80 @@ const api = axios.create({
   },
 });
 
+// Define the interface as a type export
+export type ExtractionResultType = {
+  field: string;
+  key: string;
+  value: string;
+  confidence: number;
+  entity_type?: string;
+  schema_field?: string;
+  required?: boolean;
+  bounding_box?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+};
+
+export interface DocumentClassification {
+  type: string;
+  confidence: number;
+  custom_type_name?: string;
+  reasoning?: string;
+  suggested_schema: {
+    name: string;
+    description: string;
+    fields: Array<{
+      name: string;
+      key: string;
+      required: boolean;
+      description?: string;
+      examples?: string[];
+    }>;
+  };
+}
+
+export interface ExtractionResponse {
+  success: boolean;
+  file_id: string;
+  filename: string;
+  document_classification: DocumentClassification;
+  extraction_results: ExtractionResultType[];
+  total_fields: number;
+  high_confidence_count: number;
+}
+
+export const extractionApi = {
+  extract: async (file: File): Promise<ExtractionResponse> => {
+    console.log('API: Starting extraction for file:', file.name, file.size, file.type);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    console.log('API: Sending request to /api/v1/extraction/extract');
+    const response = await api.post('/api/v1/extraction/extract', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    console.log('API: Received response:', response.data);
+    return response.data;
+  },
+
+  getFields: async () => {
+    const response = await api.get('/api/v1/extraction/fields');
+    return response.data.fields;
+  },
+
+  getStatus: async (fileId: string) => {
+    const response = await api.get(`/api/v1/extraction/status/${fileId}`);
+    return response.data;
+  },
+};
+
 export const documentApi = {
   upload: async (file: File): Promise<Document> => {
     const formData = new FormData();

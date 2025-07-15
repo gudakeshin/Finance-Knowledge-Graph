@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg">
+    <button onclick="testExtraction()">Test Extraction</button>
+    <div id="result"></div>
+
+    <script>
+        async function testExtraction() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '<p>Please select a file first</p>';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            console.log('Testing with file:', file.name, file.size, file.type);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                console.log('Sending request to backend...');
+                const response = await fetch('http://localhost:8000/api/v1/extraction/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    resultDiv.innerHTML = `<p>Error: ${response.status} - ${errorText}</p>`;
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('Success response:', data);
+                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

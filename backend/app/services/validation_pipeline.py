@@ -7,7 +7,7 @@ from ..models.graph_models import Entity, Relationship, EntityType, Relationship
 from enum import Enum
 import time
 import re
-from ..models.validation_models import ValidationRule, ValidationResult
+from ..models.validation_models import ValidationRule
 from ..models.status_models import ValidationStatus, CorrectionStatus
 from ..models.correction_models import CorrectionStrategyEnum
 from ..models.batch_models import BatchStatus, BatchSummary

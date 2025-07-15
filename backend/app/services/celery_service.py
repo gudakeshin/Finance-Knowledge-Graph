@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 import uuid
 import numpy as np
 from collections import defaultdict
-from backend.app.models.graph_models import Entity, Relationship, EntityType, RelationshipType
-from backend.app.services.neo4j_service import Neo4jService
-from backend.app.services.entity_recognition import FinancialEntityRecognizer
-from backend.app.services.relationship_extraction import RelationshipExtractor
-from backend.app.services.status_tracker import StatusTracker, ProcessingStatus, ProcessingStage
+from app.models.graph_models import Entity, Relationship, EntityType, RelationshipType
+from app.services.neo4j_service import Neo4jService
+from app.services.entity_recognition import FinancialEntityRecognizer
+from app.services.relationship_extraction import RelationshipExtractor
+from app.services.status_tracker import StatusTracker, ProcessingStatus, ProcessingStage
 
 logger = logging.getLogger(__name__)
 

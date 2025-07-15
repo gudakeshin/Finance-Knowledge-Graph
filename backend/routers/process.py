@@ -15,9 +15,9 @@ import re
 from collections import defaultdict
 import uuid
 import time
-from backend.app.services.entity_recognition import FinancialEntityRecognizer, FinancialEntity
-from backend.app.services.relationship_extraction import RelationshipExtractor, Relationship
-from backend.app.services.celery_service import (
+from app.services.entity_recognition import FinancialEntityRecognizer, FinancialEntity
+from app.services.relationship_extraction import RelationshipExtractor, Relationship
+from app.services.celery_service import (
     process_document_task,
     update_entity_task,
     merge_entities_task,
@@ -30,29 +30,28 @@ from backend.app.services.celery_service import (
     analyze_market_trends_task,
     analyze_risk_factors_task
 )
-from backend.app.services.status_tracker import (
+from app.services.status_tracker import (
     StatusTracker,
     ProcessingStatus,
     ProcessingStage,
     ProcessingMetrics,
     DocumentStatus
 )
-from backend.app.models.graph_models import Entity, Relationship, EntityType, RelationshipType
-from backend.app.services.neo4j_service import Neo4jService
-from backend.app.services.validation_service import ValidationService, ValidationRule, EntityValidationRule, RelationshipValidationRule, ValidationResult, ValidationLevel
-from backend.app.services.quality_control import QualityControlService, QualityMetricType
-from backend.app.services.validation_pipeline import ValidationPipeline
+from app.models.graph_models import Entity, Relationship, EntityType, RelationshipType
+from app.services.neo4j_service import Neo4jService
+from app.services.validation_service import ValidationService, ValidationRule, EntityValidationRule, RelationshipValidationRule, ValidationResult, ValidationLevel
+from app.services.quality_control import QualityControlService, QualityMetricType
+from app.services.validation_pipeline import ValidationPipeline
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 from plotly.subplots import make_subplots
 from fastapi.responses import JSONResponse
 import networkx as nx
-from backend.app.config import settings
+from app.config import settings
 from pydantic import BaseModel
-from backend.app.models.validation_models import ValidationResult
-from backend.app.models.correction_models import CorrectionStrategy
-from backend.app.models.financial_domain import FinancialDomain
+from app.models.correction_models import CorrectionStrategy
+from app.models.financial_domain import FinancialDomain
 
 # Pydantic models for request/response
 class ValidationRequest(BaseModel):

@@ -220,40 +220,23 @@ class ServiceManager:
             return False
     
     def setup_python_environment(self) -> bool:
-        """Setup Python virtual environment and install dependencies."""
+        """Setup Python environment and check dependencies."""
         logger.info("🔧 Setting up Python environment...")
         
-        # Check if virtual environment exists
-        venv_path = Path("venv")
-        if not venv_path.exists():
-            logger.info("📦 Creating virtual environment...")
-            try:
-                subprocess.run([sys.executable, "-m", "venv", "venv"], check=True)
-                logger.info("✅ Virtual environment created")
-            except subprocess.CalledProcessError as e:
-                logger.error(f"❌ Failed to create virtual environment: {e}")
-                return False
+        # Use system Python instead of virtual environment
+        python_path = sys.executable
+        pip_path = "python3"  # Use python3 for pip commands
         
-        # Determine activation script
-        if os.name == 'nt':  # Windows
-            activate_script = "venv\\Scripts\\activate"
-            python_path = "venv\\Scripts\\python.exe"
-            pip_path = "venv\\Scripts\\pip.exe"
-        else:  # Unix/Linux/macOS
-            activate_script = "venv/bin/activate"
-            python_path = "venv/bin/python"
-            pip_path = "venv/bin/pip"
-        
-        # Check if requirements are installed
+        # Check if core dependencies are installed
         try:
             result = subprocess.run(
-                [python_path, "-c", "import fastapi, celery, neo4j"],
+                [python_path, "-c", "import fastapi, celery, neo4j, requests"],
                 capture_output=True
             )
             if result.returncode != 0:
-                logger.info("📦 Installing Python dependencies...")
-                subprocess.run([pip_path, "install", "-r", "requirements.txt"], check=True)
-                logger.info("✅ Dependencies installed")
+                logger.info("📦 Installing core Python dependencies...")
+                subprocess.run([pip_path, "install", "fastapi", "celery", "neo4j", "requests", "uvicorn", "python-dotenv"], check=True)
+                logger.info("✅ Core dependencies installed")
             else:
                 logger.info("✅ Python dependencies already installed")
         except subprocess.CalledProcessError as e:
@@ -275,11 +258,8 @@ class ServiceManager:
         
         logger.info(f"🚀 Starting backend server on port {self.backend_port}...")
         
-        # Determine Python path
-        if os.name == 'nt':  # Windows
-            python_path = "venv\\Scripts\\python.exe"
-        else:  # Unix/Linux/macOS
-            python_path = "venv/bin/python"
+        # Use system Python
+        python_path = sys.executable
         
         try:
             # Start FastAPI server
@@ -316,25 +296,23 @@ class ServiceManager:
         """Start Celery worker for background tasks."""
         logger.info("🚀 Starting Celery worker...")
         
-        # Determine Python path
-        if os.name == 'nt':  # Windows
-            python_path = "venv\\Scripts\\python.exe"
-        else:  # Unix/Linux/macOS
-            python_path = "venv/bin/python"
+        # Use system Python
+        python_path = sys.executable
         
         try:
             # Start Celery worker
             process = subprocess.Popen(
                 [
                     python_path, "-m", "celery", 
-                    "-A", "backend.app.services.celery_service", 
+                    "-A", "backend.app.services.celery_service.app", 
                     "worker", 
                     "--loglevel=info",
                     "--concurrency=2"
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
+                cwd=os.getcwd()  # Ensure we're in the project root
             )
             
             self.processes['celery'] = process
